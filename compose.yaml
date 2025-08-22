@@ -1,0 +1,40 @@
+services:
+  
+  database:
+    image: mysql:8.0 
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456 
+      MYSQL_DATABASE: todo_app 
+    ports:
+      - "3307:3306" 
+    volumes:
+      - db-data:/var/lib/mysql 
+
+  backend:
+    build: ./backend 
+    container_name: backend_api
+    restart: always
+    ports:
+      - "3001:3001" 
+    # depends_on:
+    #   - database 
+    # environment:
+    #   DB_HOST: database 
+    #   DB_USER: root
+    #   DB_PASSWORD: 123456
+    #   DB_NAME: todo_app
+
+
+  frontend:
+    build: ./frontend 
+    container_name: frontend_ui
+    restart: always
+    ports:
+      - "3000:80" 
+    depends_on:
+      - backend 
+
+volumes:
+  db-data: 
