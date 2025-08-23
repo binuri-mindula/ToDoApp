@@ -24,7 +24,7 @@ app.use(cors({
 // Connect DB and sync
 connectDB();
 
-app.use(ToDoRoute);
+app.use('/api/tasks',ToDoRoute);
 
 
 app.listen(port,()=>{

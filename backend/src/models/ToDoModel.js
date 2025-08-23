@@ -14,9 +14,16 @@ const Task = sequelize.define('Task', {
     description: {
         type: DataTypes.TEXT,
         allowNull: true,
+    },
+    completed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
     }
 }, {
     timestamps: true,
 });
+
+sequelize.sync();
 
 export default Task;

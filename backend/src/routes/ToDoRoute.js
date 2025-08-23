@@ -1,8 +1,18 @@
-import Router from 'express';
+import {Router} from 'express';
+import {
+    createTask,
+    getAllTasks,
+    getTaskById,
+    updateTask,
+    deleteTask
+} from '../controllers/ToDoController.js';
 const router = Router();
 
-router.get('/', (req, res) => {
-    res.json({message:'ToDo API is working'});
-});
+router.post('/', createTask);
+router.get('/', getAllTasks);
+router.get('/:id', getTaskById);
+router.put('/:id', updateTask);
+router.delete('/:id', deleteTask);
+
 
 export default router;
