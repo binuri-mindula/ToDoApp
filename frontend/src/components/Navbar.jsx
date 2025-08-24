@@ -1,13 +1,39 @@
 import React from 'react';
-import { FaBars } from 'react-icons/fa';
-const Navbar = ({ toggleSidebar }) => {
-return (
-<nav className="bg-white shadow-md p-4 flex items-center">
-<button onClick={toggleSidebar} className="text-gray-600 mr-4 text-xl">
-<FaBars />
-</button>
-<h1 className="text-xl font-bold text-gray-800">TaskLog</h1>
-</nav>
-);
+import { NavLink } from 'react-router-dom';
+import { FaRocket } from 'react-icons/fa';
+import avatar from '../assets/profile.png'
+
+const Navbar = () => {
+
+
+    return (
+        <header className="bg-white/80 backdrop-blur-lg fixed top-0 left-0 right-0 z-30 border-b border-gray-200">
+            <div className="container mx-auto px-6">
+                <div className="flex items-center justify-between h-20">
+                  
+                    <NavLink to="/tasks" className="flex items-center gap-3">
+                        <FaRocket className="text-3xl text-blue-600" />
+                        <span className="text-2xl font-bold text-gray-800 tracking-tight">
+                            NextUp
+                        </span>
+                    </NavLink>
+
+                  
+
+                 
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center cursor-pointer">
+                            <img 
+                                src={avatar} 
+                                alt="User Avatar"
+                                className="w-6 h-6 rounded-full"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    );
 };
+
 export default Navbar;

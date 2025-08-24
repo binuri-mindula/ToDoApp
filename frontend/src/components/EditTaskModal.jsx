@@ -1,84 +1,92 @@
-import React, { useState } from 'react';
-import * as taskService from '../services/taskService';
+import React, { useState, useEffect } from 'react';
+import { FaTrash } from 'react-icons/fa';
+import { updateTask, deleteTask } from '../services/taskService';
 
-const AddTaskForm = ({ isOpen, onClose, onTaskAdded }) => {
+const EditTaskModal = ({ task, isOpen, onClose, onActionComplete }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (task) {
+            setName(task.name);
+            setDescription(task.description || '');
+            setError(''); 
+        }
+    }, [task]);
 
     if (!isOpen) {
         return null;
     }
 
-    const handleSubmit = async (e) => {
+    const handleUpdate = async (e) => {
         e.preventDefault();
-        if (!name) {
-            setError('Name is required!');
-            return;
-        }
-
         try {
-            await taskService.addTask({ name, description });
-            // Clear the form for the next time it opens
-            setName('');
-            setDescription('');
-            setError('');
-            // Signal to the parent that a task was added successfully
-            onTaskAdded(); 
+            await updateTask(task.id, { name, description });
+            onActionComplete(); 
         } catch (err) {
-            setError('Failed to add task. Please try again.');
+            setError('Failed to update task.');
             console.error(err);
         }
     };
 
-    const handleClose = () => {
-        // Reset form state when closing
-        setName('');
-        setDescription('');
-        setError('');
-        onClose();
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to delete this task?')) {
+            try {
+                await deleteTask(task.id);
+                onActionComplete();
+            } catch (err) {
+                setError('Failed to delete task.');
+                console.error(err);
+            }
+        }
     };
 
     return (
-        // Modal Overlay
         <div 
             className="fixed inset-0 bg-black/60 bg-opacity-50 z-40 flex justify-center items-center"
-            onClick={handleClose}
+            onClick={onClose} 
         >
-            {/* Modal Content */}
             <div 
                 className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative"
-                onClick={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()} 
             >
-                <h2 className="text-2xl font-bold mb-4">Add a New Task</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold">Edit Task</h2>
+                    <button 
+                        onClick={handleDelete}
+                        className="text-red-500 hover:text-red-700 transition duration-300 text-xl"
+                        title="Delete Task"
+                    >
+                        <FaTrash />
+                    </button>
+                </div>
                 {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleUpdate}>
                     <div className="mb-4">
-                        <label htmlFor="add-name" className="block text-gray-700 font-medium mb-2">Name</label>
+                        <label htmlFor="edit-name" className="block text-gray-700 font-medium mb-2">Name</label>
                         <input
                             type="text"
-                            id="add-name"
+                            id="edit-name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Ex: Buy groceries"
                         />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="add-description" className="block text-gray-700 font-medium mb-2">Description</label>
+                        <label htmlFor="edit-description" className="block text-gray-700 font-medium mb-2">Description</label>
                         <textarea
-                            id="add-description"
+                            id="edit-description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Ex: Milk, bread, cheese"
                             rows="4"
                         ></textarea>
                     </div>
-                    <div className="flex justify-end gap-4 mt-6">
+                    <div className="flex justify-end gap-4">
                          <button
                             type="button"
-                            onClick={handleClose}
+                            onClick={onClose}
                             className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-300"
                         >
                             Cancel
@@ -87,7 +95,7 @@ const AddTaskForm = ({ isOpen, onClose, onTaskAdded }) => {
                             type="submit"
                             className="bg-main-blue text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-950 transition duration-300"
                         >
-                            Add Task
+                            Save Changes
                         </button>
                     </div>
                 </form>
@@ -96,4 +104,4 @@ const AddTaskForm = ({ isOpen, onClose, onTaskAdded }) => {
     );
 };
 
-export default AddTaskForm;
+export default EditTaskModal;
