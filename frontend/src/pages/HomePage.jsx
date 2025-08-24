@@ -3,10 +3,10 @@ import { FaPlus } from 'react-icons/fa';
 import TaskList from '../components/TaskList';
 import * as taskService from '../services/taskService';
 import AddTaskForm from '../components/AddTaskForm';
+import toast from 'react-hot-toast'; 
 
 const HomePage = () => {
     const [tasks, setTasks] = useState([]);
-    const [error, setError] = useState(null);
     const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
     const fetchTasks = useCallback(async () => {
@@ -14,7 +14,7 @@ const HomePage = () => {
             const response = await taskService.getTasks();
             setTasks(response.data);
         } catch (err) {
-            setError('Failed to fetch tasks. Please ensure the backend is running.');
+           toast.error('Failed to fetch tasks. Please ensure the backend is running.');
             console.error(err);
         }
     }, []);
@@ -26,9 +26,10 @@ const HomePage = () => {
     const handleCompleteTask = async (taskId) => {
         try {
             await taskService.updateTask(taskId, { completed: true });
+            toast.success('Task marked as complete!');
             fetchTasks(); 
         } catch (err) {
-            setError('Failed to complete task.');
+            toast.error('Failed to complete task.');
             console.error(err);
         }
     };
@@ -51,9 +52,9 @@ const HomePage = () => {
                 </button>
             </div>
 
-            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">{error}</div>}
+          
             
-            <TaskList tasks={tasks} onComplete={handleCompleteTask} />
+            <TaskList tasks={tasks} onComplete={handleCompleteTask} fetchTasks={fetchTasks} />
 
             <AddTaskForm
                 isOpen={isAddTaskModalOpen}

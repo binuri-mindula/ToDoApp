@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast'; 
 import { FaTrash } from 'react-icons/fa';
 import { updateTask, deleteTask } from '../services/taskService';
 
 const EditTaskModal = ({ task, isOpen, onClose, onActionComplete }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [error, setError] = useState('');
 
     useEffect(() => {
         if (task) {
             setName(task.name);
             setDescription(task.description || '');
-            setError(''); 
         }
     }, [task]);
 
@@ -21,11 +20,17 @@ const EditTaskModal = ({ task, isOpen, onClose, onActionComplete }) => {
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+        if (!name) {
+            toast.error('Name cannot be empty!');
+            return;
+        }
+
         try {
             await updateTask(task.id, { name, description });
+            toast.success('Task updated successfully!');
             onActionComplete(); 
         } catch (err) {
-            setError('Failed to update task.');
+            toast.error('Failed to update task.');
             console.error(err);
         }
     };
@@ -34,9 +39,10 @@ const EditTaskModal = ({ task, isOpen, onClose, onActionComplete }) => {
         if (window.confirm('Are you sure you want to delete this task?')) {
             try {
                 await deleteTask(task.id);
+                toast.success('Task deleted!');
                 onActionComplete();
             } catch (err) {
-                setError('Failed to delete task.');
+                toast.error('Failed to delete task.');
                 console.error(err);
             }
         }
@@ -44,7 +50,7 @@ const EditTaskModal = ({ task, isOpen, onClose, onActionComplete }) => {
 
     return (
         <div 
-            className="fixed inset-0 bg-black/60 bg-opacity-50 z-40 flex justify-center items-center"
+            className="fixed inset-0 bg-black/80 bg-opacity-50 z-40 flex justify-center items-center"
             onClick={onClose} 
         >
             <div 
@@ -61,7 +67,6 @@ const EditTaskModal = ({ task, isOpen, onClose, onActionComplete }) => {
                         <FaTrash />
                     </button>
                 </div>
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
                 <form onSubmit={handleUpdate}>
                     <div className="mb-4">
                         <label htmlFor="edit-name" className="block text-gray-700 font-medium mb-2">Name</label>

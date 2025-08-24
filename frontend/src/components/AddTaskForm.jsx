@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast'; 
 import * as taskService from '../services/taskService';
 
 const AddTaskForm = ({ isOpen, onClose, onTaskAdded }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [error, setError] = useState('');
 
     if (!isOpen) {
         return null;
@@ -13,45 +13,44 @@ const AddTaskForm = ({ isOpen, onClose, onTaskAdded }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!name) {
-            setError('Name is required!');
+          
+            toast.error('Name is required!');
             return;
         }
 
         try {
-            await taskService.addTask({ name, description });
-            // Clear the form for the next time it opens
+            const response = await taskService.addTask({ name, description });
+            
+            toast.success(response.data.message || 'Task added successfully!');
+
             setName('');
             setDescription('');
-            setError('');
-            // Signal to the parent that a task was added successfully
             onTaskAdded(); 
+
         } catch (err) {
-            setError('Failed to add task. Please try again.');
+        
+            toast.error('Failed to add task. Please try again.');
             console.error(err);
         }
     };
 
     const handleClose = () => {
-        // Reset form state when closing
+   
         setName('');
         setDescription('');
-        setError('');
         onClose();
     };
 
     return (
-        // Modal Overlay
         <div 
-            className="fixed inset-0 bg-black/60 bg-opacity-50 z-40 flex justify-center items-center"
+            className="fixed inset-0 bg-black/80 bg-opacity-50 z-40 flex justify-center items-center"
             onClick={handleClose}
         >
-            {/* Modal Content */}
             <div 
                 className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative"
                 onClick={e => e.stopPropagation()}
             >
                 <h2 className="text-2xl font-bold mb-4">Add a New Task</h2>
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label htmlFor="add-name" className="block text-gray-700 font-medium mb-2">Name</label>
