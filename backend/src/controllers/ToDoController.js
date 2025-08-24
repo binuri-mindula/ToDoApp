@@ -23,11 +23,23 @@ export const createTask = async (req, res) => {
 //get all tasks
 export const getAllTasks = async (req, res) => {
     try {
-        const tasks = await Task.findAll({
-            where: { completed: false },      // only get completed tasks
-            order: [['createdAt', 'DESC']], // newest first
-            limit: 5                          // most recent 5 tasks
-        });
+       
+        const { limit } = req.query;
+
+        const queryOptions = {
+            where: { completed: false },
+            order: [['createdAt', 'DESC']],
+        };
+
+        if (limit) {
+            const parsedLimit = parseInt(limit, 10); // Parse string to a number
+
+            if (!isNaN(parsedLimit) && parsedLimit > 0) {
+                queryOptions.limit = parsedLimit;
+            }
+        }
+
+        const tasks = await Task.findAll(queryOptions);
 
         res.status(200).json(tasks);
     } catch (error) {
