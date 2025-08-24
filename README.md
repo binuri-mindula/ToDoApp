@@ -35,10 +35,13 @@ You must have the following software installed on your system:
 ## Running the Application
 
 1. Clone the repository:
+
     git clone https://github.com/binuri-mindula/ToDoApp.git
+
     cd project-root
 
 2. Build and start all services:
+
     docker-compose up --build
 
 3. Access the app:
@@ -56,9 +59,11 @@ You must have the following software installed on your system:
 5. Testing
 
    Backend Tests: Run inside the backend container
+
       docker exec -it backend_api npm test
 
    Frontend Tests:
+   
       docker exec -it frontend_ui npm test
 
 ## Future Improvements
